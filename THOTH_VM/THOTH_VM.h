@@ -9,8 +9,12 @@
 #include <errno.h>
 #include <birchutils.h>
 
-#define ErrMem 0x01
-#define NoArgs {0x00, 0x00}
+#define VM_MEM ((int16)(-1))
+
+#define NoErr 0x00 // 00 00
+#define SysHlt 0x01 // 00 01
+#define ErrMem 0x02 // 00 10
+#define ErrSegv 0x03 // 00 11
 
 typedef unsigned char int8;
 typedef unsigned short int int16;
@@ -24,8 +28,19 @@ typedef unsigned long long int int64;
 #define $c (char *)
 #define $i (int)
 
+
+#define $ax ->c.r.ax
+#define $bx ->c.r.bx
+#define $cx ->c.r.cx
+#define $dx ->c.r.dx
+#define $sp ->c.r.sp
+#define $ip ->c.r.ip
+
+
+#define segfault(vm) error(vm, ErrSegv)
+
 /**
-    16 bit virtual machine
+    16 bit virtual machineb
         (65536 mem adresses)
     
     The Registers:
@@ -45,9 +60,9 @@ typedef unsigned long long int int64;
  */
 
 typedef unsigned short int Reg;
-typedef int8 Args;
+typedef int16 Args;
 
-typedef int8 Memory[((int16)(-1))];
+typedef int8 Memory[VM_MEM];
 //typedef int8 Memory[((unsigned int)(-1))];
 
 typedef unsigned char ErrorCode;
@@ -83,7 +98,6 @@ enum e_opcode{
     mov = 0X01,
     nop = 0x02,    
     hlt = 0x03,
-
 };
 
 typedef enum e_opcode Opcode;
@@ -122,12 +136,17 @@ static IM instrmap[] = {
 };
 
 #define IMs ( sizeof(instrmap) / (sizeof(struct s_instrmap)) )
+void MOV(VM *vm, Opcode o, Args a0, Args a1);
 
+
+
+void execi(VM* vm, Program *pp);
 void error(VM* vm, ErrorCode e);
-void evecute(VM*);
-    Program *exempleProgram(VM* vm); 
-int8 map(Opcode);
+void execute(VM* vm);
+    Program *exampleProgram(VM* vm); 
+int8 map(Opcode o);
 VM *virtualMachine();
+int destroyVirtualMachine(VM *vm);
 
 int main(int,char**);
 
@@ -143,8 +162,6 @@ Section .text(code)
     ****
     ******
     *********
-
-
-
+    
 Section .data
 */
