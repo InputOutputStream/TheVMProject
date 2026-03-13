@@ -22,7 +22,7 @@ int8 map(Opcode o){
     return ret;
 }
 
-void MOV(VM *vm, Opcode o, Args a0, Args a1){
+void MOV(VM *vm, Opcode o, Args a1, Args a2){
     vm $ax = (Reg)a1;
     return;
 }
@@ -42,7 +42,7 @@ void execi(VM* vm, Program *pp)
             a1 = *(pp+1);
             break;
         case 3:
-            a1 = *(pp+2);
+            a1 = *(pp+1);
             a2 = *(pp+3);
             break;
         default:
@@ -182,7 +182,7 @@ void execute(VM* vm){
     Instruction ip;
     assert(vm && *vm->m);
     brkaddr = ((int16)vm->m + vm->b);
-    pp = (Program *)&vm -> m;
+    pp = vm -> m;
     fprintf(stdout, "vm -> m = %p *vm -> m = %d \n", vm -> m, *vm -> m);
 
     /**
